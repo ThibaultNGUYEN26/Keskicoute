@@ -4,9 +4,6 @@ import random
 CHAR_LIMIT = 10
 USERNAME_CHAR_LIMIT = 15
 
-def random_price():
-	return round(random.uniform(5, 1000000), 2)
-
 class Keskicoute:
 	def __init__(self, root):
 		""" ---------- [ ROOT SETUP ] ---------- """
@@ -21,8 +18,8 @@ class Keskicoute:
 		""" ---------- [ MAIN FRAME SETUP ] ---------- """
 		self.setup_main_frame()
 		
-		""" ---------- [ GAME FRAME SETUP ] ---------- """
-		self.setup_game_frame()
+		""" ---------- [ DIFFICULTY SELECTION FRAME SETUP ] ---------- """
+		self.setup_difficulty_frame()
 
 		""" ---------- [ KEY BINDINGS ] ---------- """
 		self.root.bind('<Escape>', self.exit_win)
@@ -33,11 +30,10 @@ class Keskicoute:
 		self.player2_calculated = False
 		self.player1_score = 0
 		self.player2_score = 0
-		self.price = random_price()
+		self.price = 0
 
 	def setup_main_frame(self):
 		self.main_frame = Frame(self.root, bg="black", width=self.width, height=self.height)
-		self.main_frame.place(x=0, y=0)
 
 		self.str1 = StringVar()
 		self.player1_label = Label(self.main_frame, text="Player 1", bg="black", fg="white", font=("Futura 20 bold"))
@@ -58,6 +54,22 @@ class Keskicoute:
 
 		self.player2_button = Button(self.main_frame, command=self.display_game_frame, bg="black", fg="white", text="Play", font=("Futura", 15))
 
+	def setup_difficulty_frame(self):
+		self.difficulty_frame = Frame(self.root, bg="black", width=self.width, height=self.height)
+		self.difficulty_frame.place(x=0, y=0)
+
+		self.easy_button = Button(self.difficulty_frame, text="Easy", command=lambda: self.set_difficulty(100), font=("Futura 20 bold"), bg="green", fg="white")
+		self.easy_button.place(relx=0.5, rely=0.35, anchor="center")
+
+		self.medium_button = Button(self.difficulty_frame, text="Medium", command=lambda: self.set_difficulty(1000), font=("Futura 20 bold"), bg="blue", fg="white")
+		self.medium_button.place(relx=0.5, rely=0.45, anchor="center")
+
+		self.hard_button = Button(self.difficulty_frame, text="Hard", command=lambda: self.set_difficulty(100000), font=("Futura 20 bold"), bg="orange", fg="white")
+		self.hard_button.place(relx=0.5, rely=0.55, anchor="center")
+
+		self.hardcore_button = Button(self.difficulty_frame, text="Hardcore", command=lambda: self.set_difficulty(1000000), font=("Futura 20 bold"), bg="red", fg="white")
+		self.hardcore_button.place(relx=0.5, rely=0.65, anchor="center")
+
 	def setup_game_frame(self):
 		self.game_frame = Frame(self.root, bg="black", width=self.width, height=self.height)
 
@@ -66,6 +78,15 @@ class Keskicoute:
 
 		self.price_to_find = Label(self.game_frame, text=f"{self.price}€", fg="white", bg="black", font=("Futura", 17, 'bold'))
 		self.price_to_find.place(relx=0.5, rely=0.18, anchor="center")
+
+	def set_difficulty(self, max_price):
+		self.price = self.random_price(max_price)
+		self.setup_game_frame()
+		self.difficulty_frame.place_forget()
+		self.main_frame.place(x=0, y=0)
+
+	def random_price(self, max_price):
+		return round(random.uniform(5, max_price), 2)
 
 	def on_player1_entry_change(self, *args):
 		self.str1.set(self.str1.get().upper())
