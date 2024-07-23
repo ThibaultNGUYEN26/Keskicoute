@@ -20,20 +20,28 @@ class Keskicoute:
 	def calculate_player1(self):
 		entries = [self.player1_input1.get(), self.player1_input2.get(), self.player1_input3.get(), self.player1_input4.get()]
 		try:
-			values = [float(entry) for entry in entries]
+			values = [float(entry) if entry else 0 for entry in entries]
 			total = sum(values)
 			print(f"Player 1 total: {total}")
+			self.player1_calculated = True
+			self.check_calculations()
 		except ValueError:
 			print("Please enter valid float values for Player 1")
 
 	def calculate_player2(self):
 		entries = [self.player2_input1.get(), self.player2_input2.get(), self.player2_input3.get(), self.player2_input4.get()]
 		try:
-			values = [float(entry) for entry in entries]
+			values = [float(entry) if entry else 0 for entry in entries]
 			total = sum(values)
 			print(f"Player 2 total: {total}")
+			self.player2_calculated = True
+			self.check_calculations()
 		except ValueError:
 			print("Please enter valid float values for Player 2")
+
+	def check_calculations(self):
+		if self.player1_calculated and self.player2_calculated:
+			print("Both players have calculated their totals")
 
 	def display_game_frame(self):
 		self.main_frame.place_forget()
@@ -125,6 +133,8 @@ class Keskicoute:
 		self.root.title("Keskicoute")
 		self.root.geometry(f"{self.width}x{self.height}")
 		self.root.configure(bg="black")
+		self.player1_calculated = False
+		self.player2_calculated = False
 
 		""" ---------- [ MAIN FRAME ] ---------- """
 		self.main_frame = Frame(self.root, bg="black", width=self.width, height=self.height)
