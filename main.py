@@ -1,7 +1,8 @@
 from tkinter import Tk, Frame, Button, Label, CENTER, Entry, StringVar
 import random
 
-CHAR_LIMIT = 15
+CHAR_LIMIT = 10
+USERNAME_CHAR_LIMIT = 15
 
 def random_price():
 	return round(random.uniform(5, 1000000), 2)
@@ -21,8 +22,7 @@ class Keskicoute:
 		entries = [self.player1_input1.get(), self.player1_input2.get(), self.player1_input3.get(), self.player1_input4.get()]
 		try:
 			values = [float(entry) if entry else 0 for entry in entries]
-			total = sum(values)
-			print(f"Player 1 total: {total}")
+			self.player1_score = sum(values)
 			self.player1_calculated = True
 			self.check_calculations()
 		except ValueError:
@@ -32,8 +32,7 @@ class Keskicoute:
 		entries = [self.player2_input1.get(), self.player2_input2.get(), self.player2_input3.get(), self.player2_input4.get()]
 		try:
 			values = [float(entry) if entry else 0 for entry in entries]
-			total = sum(values)
-			print(f"Player 2 total: {total}")
+			self.player2_score = sum(values)
 			self.player2_calculated = True
 			self.check_calculations()
 		except ValueError:
@@ -41,19 +40,43 @@ class Keskicoute:
 
 	def check_calculations(self):
 		if self.player1_calculated and self.player2_calculated:
-			print("Both players have calculated their totals")
+			diff_player1 = abs(self.player1_score - self.price)
+			diff_player2 = abs(self.player2_score - self.price)
+
+			if diff_player1 < diff_player2:
+				winner = self.player1_name
+			elif diff_player2 < diff_player1:
+				winner = self.player2_name
+			else:
+				winner = "Draw"
+
+			self.calculate_button1.place_forget()
+			self.calculate_button2.place_forget()
+
+			self.total_player1 = Label(self.game_frame, text=f"total: {self.player1_score}€", fg="white", bg="black", font=("Futura 18 bold"))
+			self.total_player1.place(relx=0.2, rely=0.8, anchor=CENTER)
+			self.total_player2 = Label(self.game_frame, text=f"total: {self.player2_score}€", fg="white", bg="black", font=("Futura 18 bold"))
+			self.total_player2.place(relx=0.8, rely=0.8, anchor=CENTER)
+
+			self.winner_label = Label(self.game_frame, text=winner, fg="white", bg="black", font=("Futura 20 bold"))
+			self.winner_label.place(relx=0.5, rely=0.5, anchor=CENTER)
+			self.won_label = Label(self.game_frame, text="Win", fg="white", bg="black", font=("Futura 20 bold"))
+			self.won_label.place(relx=0.5, rely=0.57, anchor=CENTER)
+
+			self.replay_button = Button(self.game_frame, text="Replay", font=("Futura 20 bold"))
+			self.replay_button.place(relx=0.5, rely=0.8, anchor=CENTER)
 
 	def display_game_frame(self):
 		self.main_frame.place_forget()
 		self.game_frame.place(x=0, y=0)
 
-		player1_name = self.str1.get()
-		player2_name = self.str2.get()
+		self.player1_name = self.str1.get()
+		self.player2_name = self.str2.get()
 
-		self.player1_display = Label(self.game_frame, text=f"{player1_name}", fg="white", bg="black", font=("Futura", 17))
+		self.player1_display = Label(self.game_frame, text=f"{self.player1_name}", fg="white", bg="black", font=("Futura", 17))
 		self.player1_display.place(relx=0.2, rely=0.3, anchor=CENTER)
 		
-		self.player2_display = Label(self.game_frame, text=f"{player2_name}", fg="white", bg="black", font=("Futura", 17))
+		self.player2_display = Label(self.game_frame, text=f"{self.player2_name}", fg="white", bg="black", font=("Futura", 17))
 		self.player2_display.place(relx=0.8, rely=0.3, anchor=CENTER)
 
 		validate_float_cmd = self.root.register(self.validate_float)
@@ -89,9 +112,11 @@ class Keskicoute:
 		self.calculate_button2.place(relx=0.8, rely=0.8, anchor=CENTER)
 
 	def validate_length(self, new_value):
-		return len(new_value) <= CHAR_LIMIT
+		return len(new_value) <= USERNAME_CHAR_LIMIT
 
 	def validate_float(self, new_value):
+		if len(new_value) > CHAR_LIMIT:
+			return False
 		if new_value == "" or new_value == ".":
 			return True
 		try:
@@ -135,6 +160,8 @@ class Keskicoute:
 		self.root.configure(bg="black")
 		self.player1_calculated = False
 		self.player2_calculated = False
+		self.player1_score = 0
+		self.player2_score = 0
 
 		""" ---------- [ MAIN FRAME ] ---------- """
 		self.main_frame = Frame(self.root, bg="black", width=self.width, height=self.height)
